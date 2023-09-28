@@ -9,7 +9,6 @@ Checks: >
   -bugprone-easily-swappable-parameters,
   -cert-err33-c,
   -cert-err34-c,
-  -concurrency-mt-unsafe,
   -llvmlibc-*,
   -modernize-macro-to-enum,
   -readability-function-cognitive-complexity,
