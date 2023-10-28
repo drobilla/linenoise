@@ -452,6 +452,16 @@ buf_append(StringBuf* const buf, char const* const s, size_t const len)
     buf->length = new_length;
 }
 
+// Append an escape like `ESC [ n s` with a number and a suffix letter
+static void
+buf_append_vtesc(StringBuf* const buf, size_t const num, char const suffix)
+{
+    char seq[64] = {0};
+    int const len = snprintf(seq, sizeof(seq), VTESC "%zu%c", num, suffix);
+    assert((size_t)len == strlen(seq));
+    buf_append(buf, seq, (size_t)len);
+}
+
 static void
 buf_free(StringBuf* const buf)
 {
@@ -497,7 +507,6 @@ refresh_single_line(ComlinState const* const l, ComlinRefreshFlags const flags)
 
     // We'll build the update here, then send it all in a single write
     StringBuf update = {NULL, 0U, 0U};
-    char seq[64] = {0};
 
     // Move cursor to left edge
     buf_append(&update, "\r", 1);
@@ -513,8 +522,8 @@ refresh_single_line(ComlinState const* const l, ComlinRefreshFlags const flags)
 
     if (flags & REFRESH_WRITE) {
         // Move cursor to original position
-        snprintf(seq, sizeof(seq), "\r" VTESC "%dC", (int)(pos + l->plen));
-        buf_append(&update, seq, strlen(seq));
+        buf_append(&update, "\r", 1);
+        buf_append_vtesc(&update, pos + l->plen, 'C');
     }
 
     ComlinStatus const st = write_string(l->ofd, update.data, update.length);
@@ -536,14 +545,12 @@ refresh_multi_line(ComlinState* const l, ComlinRefreshFlags const flags)
 
     // We'll build the update here, then send it all in a single write
     StringBuf update = {NULL, 0U, 0U};
-    char seq[64] = {0};
 
     // First clear all the old used rows
     if (flags & REFRESH_CLEAN) {
         // Go to the last row
         if (old_rows > rpos) {
-            snprintf(seq, sizeof(seq), VTESC "%zuB", old_rows - rpos);
-            buf_append(&update, seq, strlen(seq));
+            buf_append_vtesc(&update, old_rows - rpos, 'B');
         }
 
         // For each row, clear it, then move up
@@ -573,16 +580,14 @@ refresh_multi_line(ComlinState* const l, ComlinRefreshFlags const flags)
         // Move the cursor up to the correct row if necessary
         size_t const rpos2 = (l->plen + l->pos + l->cols) / l->cols;
         if (rows > rpos2) {
-            snprintf(seq, sizeof(seq), VTESC "%zuA", rows - rpos2);
-            buf_append(&update, seq, strlen(seq));
+            buf_append_vtesc(&update, rows - rpos2, 'A');
         }
 
         // Move the cursor to the correct column
         buf_append(&update, "\r", 1);
         size_t const col = (l->plen + l->pos) % l->cols;
         if (col) {
-            snprintf(seq, sizeof(seq), VTESC "%zuC", col);
-            buf_append(&update, seq, strlen(seq));
+            buf_append_vtesc(&update, col, 'C');
         }
     }
 
