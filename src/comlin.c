@@ -500,15 +500,13 @@ refresh_single_line(ComlinState const* const l, ComlinRefreshFlags const flags)
         pos -= offset;
     }
 
-    // Truncate display length to fit on the line
+    // Truncate display length to fit on the row
     if (l->plen + len > l->cols) {
         len = l->cols - l->plen;
     }
 
-    // We'll build the update here, then send it all in a single write
+    // Start building an update for the whole row (to be sent in one write)
     StringBuf update = {NULL, 0U, 0U};
-
-    // Move cursor to left edge
     buf_append(&update, "\r", 1);
 
     if (flags & REFRESH_WRITE) {
@@ -560,15 +558,13 @@ refresh_multi_line(ComlinState* const l, ComlinRefreshFlags const flags)
     }
 
     if (flags & REFRESH_WRITE) {
-        // Move to the left edge and write the current prompt and line
+        // Write the current prompt and line over the current row
         buf_append(&update, "\r", 1);
         buf_append(&update, l->prompt, l->plen);
         append_line_text(&update, l->buf.data, l->buf.length, l->maskmode);
-
-        // Clear to the right edge
         buf_append(&update, VTESC "0K", 4U);
 
-        // If we're at the end of the row, move to the start of the next line
+        // If we're at the end of the row, move to the start of the next
         if (l->pos && l->pos == l->buf.length &&
             (l->pos + l->plen) % l->cols == 0) {
             buf_append(&update, "\n\r", 2);
