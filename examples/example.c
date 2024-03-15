@@ -118,7 +118,7 @@ main(int argc, char** argv)
                     comlin_hide(state);
                     printString("Async output ");
                     char decimal[24] = {0};
-                    snprintf(decimal, sizeof(decimal), "%d\n", counter++);
+                    (void)snprintf(decimal, sizeof(decimal), "%d\n", counter++);
                     printString(decimal);
                     comlin_show(state);
                 }
