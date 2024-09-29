@@ -103,7 +103,7 @@ main(int argc, char** argv)
                 }
 
                 if (retval) {
-                    const ComlinStatus st = comlin_edit_feed(state);
+                    ComlinStatus const st = comlin_edit_feed(state);
                     if (st == COMLIN_INTERRUPTED || st == COMLIN_END) {
                         line = NULL;
                         break;

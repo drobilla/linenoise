@@ -105,9 +105,9 @@ typedef enum {
 
 typedef unsigned ComlinRefreshFlags;
 
-static const ComlinRefreshFlags REFRESH_CLEAN = 1U << 0U;
-static const ComlinRefreshFlags REFRESH_WRITE = 1U << 1U;
-static const ComlinRefreshFlags REFRESH_ALL = 3U;
+static ComlinRefreshFlags const REFRESH_CLEAN = 1U << 0U;
+static ComlinRefreshFlags const REFRESH_WRITE = 1U << 1U;
+static ComlinRefreshFlags const REFRESH_ALL = 3U;
 
 static ComlinStatus
 comlin_edit_refresh(ComlinState* l);
@@ -772,7 +772,7 @@ comlin_edit_history_step(ComlinState* const l, ComlinHistoryDirection const dir)
 {
     if (l->history_len > 1U) {
         // Update the current history entry before overwriting it with the next
-        const size_t current_index = l->history_len - 1U - l->history_index;
+        size_t const current_index = l->history_len - 1U - l->history_index;
         free(l->history[current_index]);
         l->history[current_index] = comlin_copy_string(l->buf.data);
         if (!l->history[current_index]) {
@@ -793,7 +793,7 @@ comlin_edit_history_step(ComlinState* const l, ComlinHistoryDirection const dir)
         }
 
         // Show the new entry
-        const size_t new_index = l->history_len - 1U - l->history_index;
+        size_t const new_index = l->history_len - 1U - l->history_index;
         l->pos = strlen(l->history[new_index]);
         l->buf.length = 0U;
         buf_append(&l->buf, l->history[new_index], l->pos);
@@ -894,7 +894,7 @@ comlin_edit_delete_prev_word(ComlinState* const l)
 static ComlinStatus
 comlin_edit_clear_screen(ComlinState* const state)
 {
-    const ComlinStatus st = comlin_clear_screen(state);
+    ComlinStatus const st = comlin_clear_screen(state);
 
     return st ? st : edit_status(comlin_edit_refresh(state));
 }
