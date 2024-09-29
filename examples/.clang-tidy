@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 Checks: >
+  -*-magic-numbers,
   -concurrency-mt-unsafe,
   -readability-function-cognitive-complexity,
 InheritParentConfig: true
