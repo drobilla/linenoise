@@ -471,7 +471,7 @@ format_size(char* const buf, size_t x)
 
     // Write digits backwards
     do {
-        buf[i++] = '0' + (char)(x % 10U);
+        buf[i++] = (char)('0' + (x % 10U));
         x /= 10U;
     } while (x);
 
