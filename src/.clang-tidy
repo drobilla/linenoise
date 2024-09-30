@@ -3,7 +3,6 @@
 
 Checks: >
   -*-magic-numbers,
-  -bugprone-assignment-in-if-condition,
   -bugprone-easily-swappable-parameters,
   -bugprone-multi-level-implicit-pointer-conversion,
   -readability-avoid-nested-conditional-operator

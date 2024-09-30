@@ -1246,8 +1246,11 @@ comlin_history_save(ComlinState const* const state, char const* const filename)
 
     for (size_t j = 0U; !st && j < state->history_len; ++j) {
         size_t const len = strlen(state->history[j]);
-        if (len && !(st = write_string(fd, state->history[j], len))) {
-            st = write_string(fd, "\n", 1U);
+        if (len) {
+            st = write_string(fd, state->history[j], len);
+            if (!st) {
+                st = write_string(fd, "\n", 1U);
+            }
         }
     }
 
@@ -1266,7 +1269,9 @@ comlin_history_load(ComlinState* const state, char const* const filename)
 
     while (!st) {
         char c = '\0';
-        if (!(st = read_char(fd, &c))) {
+        st = read_char(fd, &c);
+
+        if (st == COMLIN_SUCCESS) {
             if (c == '\n' && buf.length) {
                 comlin_history_add(state, buf.data);
                 buf.length = 0U;
